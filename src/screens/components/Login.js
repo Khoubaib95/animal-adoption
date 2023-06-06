@@ -15,6 +15,10 @@ import { setUser } from "../../redux/actions/userAction";
 import * as utils from "../../utils/";
 import styles from "../../styles/Styles";
 
+//regex
+const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
+
 function Login({ navigation }) {
   const { isLoading, data, error, mutate } = useAuthApi();
   const dispatch = useDispatch();
@@ -27,11 +31,27 @@ function Login({ navigation }) {
   //const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPasword] = useState("");
+  const [errors, setErrors] = useState({});
+
+  const validateFields = () => {
+    let errors = {};
+    if (!emailRegex.test(email)) {
+      errors.email = "Adresse e-mail invalide";
+    }
+    if (!passwordRegex.test(password)) {
+      errors.password =
+        "Le mot de passe doit contenir au moins 8 caractères dont 1 lettre majuscule, 1 lettre minuscule et 1 chiffre";
+    }
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
   const sigup = () => {
-    mutate("signin", {
-      email,
-      password,
-    });
+    if (validateFields()) {
+      mutate("signin", {
+        email,
+        password,
+      });
+    }
   };
 
   useEffect(() => {
@@ -82,6 +102,7 @@ function Login({ navigation }) {
             defaultValue=""
           />*/}
         </View>
+        {errors.email && <Text style={{ color: "red" }}>{errors.email}</Text>}
         <View style={styles.inputView}>
           <TextInput
             secureTextEntry
@@ -91,23 +112,11 @@ function Login({ navigation }) {
             onChangeText={(text) => {
               setPasword(text);
             }}
-            //defaultValue={value}
-            //value={value}
           />
-          {/*<Controller
-            control={control}
-            render={({ field: { onChange, value } }) => {
-              return (
-               
-              );
-            }}
-            name="password"
-            rules={{
-              required: { value: true, message: "obligatoire" },
-            }}
-            defaultValue=""
-          />*/}
         </View>
+        {errors.password && (
+          <Text style={{ color: "red" }}>{errors.password}</Text>
+        )}
         <TouchableOpacity>
           <Text
             style={styles.forgot}
@@ -123,7 +132,7 @@ function Login({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity>
           <Text
-            style={styles.loginBtn}
+            style={styles.loginText_1}
             onPress={() => navigation.navigate("SignUp")}
           >
             S'inscrire

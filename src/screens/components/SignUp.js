@@ -22,17 +22,50 @@ function Signup({ navigation }) {
   const [phone_number, setPhone_number] = useState("");
   const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
-  const [newPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [errors, setErrors] = useState({});
+
+  //regex
+  const phoneNumberRegex = /^(?:\+\d{11}|\d{8})$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
+
+  const validateFields = () => {
+    let errors = {};
+
+    if (!emailRegex.test(email)) {
+      errors.email = "Adresse e-mail invalide";
+    }
+    if (!passwordRegex.test(password)) {
+      errors.password =
+        "Le mot de passe doit contenir au moins 8 caractères dont 1 lettre majuscule, 1 lettre minuscule et 1 chiffre";
+    }
+
+    if (!phoneNumberRegex.test(phone_number)) {
+      errors.phone_number = "numéro de letephone non valid";
+    }
+    if (password != confirmPassword)
+      errors.confirmPassword = "Le mot de passe non pariel";
+    if (first_name == "")
+      errors.first_name = "Veuillez renseigner votre prénom";
+    if (last_name == "") errors.last_name = "Veuillez renseigner votre nom";
+    if (address == "") errors.address = "Veuillez renseigner votre address";
+
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const sigup = () => {
-    mutate("signup", {
-      email,
-      password,
-      first_name,
-      last_name,
-      phone_number,
-      address,
-    });
+    if (validateFields()) {
+      /*mutate("signup", {
+        email,
+        password,
+        first_name,
+        last_name,
+        phone_number,
+        address,
+      });*/
+    }
   };
   useEffect(() => {
     if (data?.message == "success") {
@@ -50,7 +83,6 @@ function Signup({ navigation }) {
       });
     }
   }, [data]);
-  //useEffect(()=>{},[error])
 
   return (
     <View style={styles.appContent}>
@@ -70,6 +102,9 @@ function Signup({ navigation }) {
             onChangeText={(text) => setLast_name(text)}
           />
         </View>
+        {errors.last_name && (
+          <Text style={{ color: "red" }}>{errors.last_name}</Text>
+        )}
         <View style={styles.inputView}>
           <TextInput
             //secureTextEntry
@@ -79,6 +114,9 @@ function Signup({ navigation }) {
             onChangeText={(text) => setFirst_name(text)}
           />
         </View>
+        {errors.first_name && (
+          <Text style={{ color: "red" }}>{errors.last_name}</Text>
+        )}
         <View style={styles.inputView}>
           <TextInput
             //secureTextEntry
@@ -88,6 +126,10 @@ function Signup({ navigation }) {
             onChangeText={(text) => setPhone_number(text)}
           />
         </View>
+        {errors.phone_number && (
+          <Text style={{ color: "red" }}>{errors.phone_number}</Text>
+        )}
+
         <View style={styles.inputView}>
           <TextInput
             //secureTextEntry
@@ -97,6 +139,9 @@ function Signup({ navigation }) {
             onChangeText={(text) => setAddress(text)}
           />
         </View>
+        {errors.address && (
+          <Text style={{ color: "red" }}>{errors.address}</Text>
+        )}
         <View style={styles.inputView}>
           <TextInput
             //secureTextEntry
@@ -107,6 +152,7 @@ function Signup({ navigation }) {
             onChangeText={(text) => setEmail(text)}
           />
         </View>
+        {errors.email && <Text style={{ color: "red" }}>{errors.email}</Text>}
         <View style={styles.inputView}>
           <TextInput
             secureTextEntry
@@ -116,6 +162,9 @@ function Signup({ navigation }) {
             onChangeText={(text) => setPassword(text)}
           />
         </View>
+        {errors.password && (
+          <Text style={{ color: "red" }}>{errors.password}</Text>
+        )}
         <View style={styles.inputView}>
           <TextInput
             secureTextEntry
@@ -125,13 +174,10 @@ function Signup({ navigation }) {
             onChangeText={(text) => setConfirmPassword(text)}
           />
         </View>
-
-        <TouchableOpacity
-          onPress={() => {
-            sigup();
-          }}
-          style={styles.loginBtn}
-        >
+        {errors.confirmPassword && (
+          <Text style={{ color: "red" }}>{errors.confirmPassword}</Text>
+        )}
+        <TouchableOpacity onPress={sigup} style={styles.loginBtn}>
           <Text style={styles.loginText}>
             {isLoading ? "Loading ..." : "Créer votre compte"}
           </Text>
